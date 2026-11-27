@@ -1,0 +1,39 @@
+name: Daily TikTok Omni Auto
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run without spending API credits'
+        required: false
+        default: 'true'
+  # Uncomment below after adding GEMINI_API_KEY in Repository Secrets
+  # schedule:
+  #   - cron: '0 2 * * *' # 09:00 Asia/Bangkok (UTC+7)
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install FFmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - name: Run pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          CONTENT_NICHE: ${{ vars.CONTENT_NICHE }}
+          TARGET_DURATION_SEC: ${{ vars.TARGET_DURATION_SEC }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            node src/cli.js --dry-run
+          else
+            node src/cli.js
+          fi
+      - name: Upload generated MP4 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-tiktok-video
+          path: output/*.mp4

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok Omni Auto — Gemini Omni 1.2 Flash</title>
+  <style>
+    :root { color-scheme: dark; --bg: #0b0d12; --card: #141824; --border: #242b3d; --accent: #fe2c55; --cyan: #25f4ee; --text: #eef1f7; --muted: #8b95ad; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); padding: 24px; }
+    .wrap { max-width: 980px; margin: 0 auto; display: grid; gap: 18px; }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+    h1 { margin: 0 0 6px; font-size: 22px; display: flex; align-items: center; gap: 10px; }
+    h2 { margin: 0 0 12px; font-size: 16px; }
+    .sub { color: var(--muted); font-size: 13px; margin: 0; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .badge { font-size: 12px; padding: 4px 10px; border-radius: 99px; border: 1px solid var(--border); }
+    .ok { border-color: #16a34a; color: #4ade80; }
+    .warn { border-color: #ca8a04; color: #facc15; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+    label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    input, select, textarea { width: 100%; background: #0d1018; color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 9px 10px; font-size: 14px; }
+    textarea { min-height: 68px; resize: vertical; }
+    .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
+    button, a.btn { background: var(--accent); color: #fff; border: 0; border-radius: 9px; padding: 10px 16px; font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    button.sec, a.btn.sec { background: #1e2538; color: var(--text); border: 1px solid var(--border); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    pre { background: #080a0f; border: 1px solid var(--border); border-radius: 10px; padding: 12px; font-size: 12px; max-height: 220px; overflow: auto; white-space: pre-wrap; margin: 0; }
+    .run-item { border-top: 1px solid var(--border); padding: 12px 0; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
+    .run-item:first-child { border-top: 0; padding-top: 0; }
+    video { width: 150px; border-radius: 10px; background: #000; border: 1px solid var(--border); }
+    .check { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+    .check input { width: auto; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>TikTok Omni Auto</h1>
+      <p class="sub">สร้างวิดีโอ TikTok แนวตั้ง 2–3 นาทีอัตโนมัติทุกวันด้วย Gemini Omni 1.2 Flash + FFmpeg + TikTok Content Posting API</p>
+      <div class="badges" id="badges"></div>
+      <div class="row">
+        <a class="btn sec" href="/auth/tiktok" id="tiktokBtn">เชื่อมต่อบัญชี TikTok (OAuth)</a>
+        <button class="sec" id="dryRunBtn">ทดสอบระบบ (Dry Run ฟรี)</button>
+        <button id="realRunBtn">สร้าง & โพสทันที (Real Run)</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>ตั้งค่าช่องและตารางโพสประจำวัน</h2>
+      <div style="margin-bottom: 12px;">
+        <label>ธีม / แนวคอนเทนต์ประจำวัน (Content Niche)</label>
+        <textarea id="contentNiche"></textarea>
+      </div>
+      <div class="grid">
+        <div>
+          <label>ภาษา (Language)</label>
+          <select id="contentLanguage">
+            <option value="th">ไทย (th)</option>
+            <option value="en">English (en)</option>
+            <option value="ja">日本語 (ja)</option>
+          </select>
+        </div>
+        <div>
+          <label>ความยาวเป้าหมาย (วินาที: 120–180 = 2–3 นาที)</label>
+          <input id="targetDurationSec" type="number" min="15" max="180" step="15" />
+        </div>
+        <div>
+          <label>ความยาวต่อฉาก Omni 1.2 Flash (3–15 วิ)</label>
+          <input id="sceneDurationSec" type="number" min="3" max="15" />
+        </div>
+        <div>
+          <label>ความละเอียด (Resolution)</label>
+          <select id="resolution">
+            <option value="360p">360p (ถูก/เร็ว)</option>
+            <option value="720p">720p (แนะนำ)</option>
+            <option value="1080p">1080p (Full HD)</option>
+          </select>
+        </div>
+        <div>
+          <label>โหมดโพส TikTok</label>
+          <select id="privacyLevel">
+            <option value="SELF_ONLY">Draft / ส่วนตัว (ใช้ได้ทันที)</option>
+            <option value="PUBLIC_TO_EVERYONE">Public (ต้องผ่าน TikTok Audit)</option>
+            <option value="FOLLOWER_OF_CREATOR">Followers Only</option>
+          </select>
+        </div>
+        <div>
+          <label>เวลาโพสทุกวัน (เวลาเครื่อง)</label>
+          <input id="dailyPostTime" type="time" />
+        </div>
+      </div>
+      <div class="row">
+        <label class="check"><input type="checkbox" id="schedulerEnabled" /> เปิดรันอัตโนมัติทุกวัน</label>
+        <label class="check"><input type="checkbox" id="chainFrames" /> ต่อภาพจากเฟรมสุดท้ายของฉากก่อน (Seamless)</label>
+        <button class="sec" id="saveBtn">บันทึกการตั้งค่า</button>
+        <span id="saveMsg" class="sub"></span>
+      </div>
+    </div>
+
+    <div class="card" id="liveCard" style="display:none;">
+      <h2>กำลังทำงาน...</h2>
+      <pre id="liveLogs"></pre>
+    </div>
+
+    <div class="card">
+      <h2>ประวัติการสร้างคลิป</h2>
+      <div id="runsList" class="sub">ยังไม่มีประวัติ</div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let loadedForm = false;
+
+    async function refresh() {
+      const res = await fetch('/api/status');
+      const data = await res.json();
+
+      $('badges').innerHTML = [
+        `<span class="badge ${data.hasGeminiKey ? 'ok' : 'warn'}">Gemini API Key: ${data.hasGeminiKey ? 'พร้อม' : 'ยังไม่ใส่ใน .env'}</span>`,
+        `<span class="badge ${data.tiktokConnected ? 'ok' : 'warn'}">TikTok: ${data.tiktokConnected ? 'เชื่อมต่อแล้ว' : (data.hasTikTokApp ? 'ยังไม่เชื่อมต่อ' : 'ยังไม่ใส่ App Key ใน .env')}</span>`,
+        `<span class="badge ${data.settings.schedulerEnabled ? 'ok' : 'warn'}">Auto Daily (${data.settings.dailyPostTime}): ${data.settings.schedulerEnabled ? 'เปิดอยู่' : 'ปิด'}</span>`,
+      ].join('');
+
+      $('tiktokBtn').style.display = data.hasTikTokApp ? 'inline-flex' : 'none';
+
+      if (!loadedForm) {
+        const s = data.settings;
+        $('contentNiche').value = s.contentNiche;
+        $('contentLanguage').value = s.contentLanguage;
+        $('targetDurationSec').value = s.targetDurationSec;
+        $('sceneDurationSec').value = s.sceneDurationSec;
+        $('resolution').value = s.resolution;
+        $('privacyLevel').value = s.privacyLevel;
+        $('dailyPostTime').value = s.dailyPostTime;
+        $('schedulerEnabled').checked = s.schedulerEnabled;
+        $('chainFrames').checked = s.chainFrames;
+        loadedForm = true;
+      }
+
+      const busy = Boolean(data.activeRun);
+      $('dryRunBtn').disabled = busy;
+      $('realRunBtn').disabled = busy || !data.hasGeminiKey;
+      $('liveCard').style.display = busy ? 'block' : 'none';
+      if (busy) $('liveLogs').textContent = data.activeRun.logs.join('\n');
+
+      if (!data.runs.length) {
+        $('runsList').innerHTML = '<p class="sub">ยังไม่มีประวัติ — ลองกด "ทดสอบระบบ (Dry Run ฟรี)" ได้เลย</p>';
+      } else {
+        $('runsList').innerHTML = data.runs.map((r) => `
+          <div class="run-item">
+            <div>
+              <strong>${r.title || r.id}</strong>
+              <span class="badge ${r.status === 'success' ? 'ok' : 'warn'}">${r.status}${r.dryRun ? ' (dry)' : ''}</span>
+              <p class="sub">${new Date(r.startedAt).toLocaleString()} • ${r.durationSec || 0}s • TikTok: ${r.tiktok?.status || r.error || '-'}</p>
+              ${r.caption ? `<p style="font-size:13px;margin:6px 0;">${r.caption}</p>` : ''}
+            </div>
+            ${r.videoFile ? `<video controls src="/output/${r.videoFile}"></video>` : ''}
+          </div>
+        `).join('');
+      }
+    }
+
+    $('saveBtn').onclick = async () => {
+      const payload = {
+        contentNiche: $('contentNiche').value,
+        contentLanguage: $('contentLanguage').value,
+        targetDurationSec: Number($('targetDurationSec').value),
+        sceneDurationSec: Number($('sceneDurationSec').value),
+        resolution: $('resolution').value,
+        privacyLevel: $('privacyLevel').value,
+        dailyPostTime: $('dailyPostTime').value,
+        schedulerEnabled: $('schedulerEnabled').checked,
+        chainFrames: $('chainFrames').checked,
+      };
+      await fetch('/api/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      $('saveMsg').textContent = 'บันทึกแล้ว!';
+      setTimeout(() => { $('saveMsg').textContent = ''; }, 2500);
+      refresh();
+    };
+
+    $('dryRunBtn').onclick = async () => {
+      await fetch('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dryRun: true }) });
+      refresh();
+    };
+
+    $('realRunBtn').onclick = async () => {
+      if (!confirm('เริ่มสร้างวิดีโอจริงด้วย Gemini Omni 1.2 Flash? (มีค่าใช้จ่าย API)')) return;
+      await fetch('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ dryRun: false }) });
+      refresh();
+    };
+
+    refresh();
+    setInterval(refresh, 3000);
+  </script>
+</body>
+</html>
