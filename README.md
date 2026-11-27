@@ -1,6 +1,6 @@
 # TikTok Omni Auto
 
-แอปสร้างและโพสวิดีโอ TikTok แนวตั้ง (9:16) ความยาว **2–3 นาที** อัตโนมัติทุกวัน โดยใช้ **Gemini 2.5 Flash** (วางสคริปต์/แตกฉาก) + **Gemini Omni 1.2 Flash** (เจนวิดีโอทีละฉากสูงสุด 15 วิ พร้อมต่อเฟรมสุดท้ายให้ภาพต่อเนื่อง) + **FFmpeg** (ต่อคลิปเป็น MP4 มาตรฐาน TikTok) + **TikTok Content Posting API**
+แอปสร้างและโพสวิดีโอ TikTok แนวตั้ง (9:16) ความยาว **2–3 นาที** อัตโนมัติทุกวัน โดยใช้ **Gemini 3.8 Flash** (วางสคริปต์/แตกฉาก) + **Gemini Omni 1.2 Flash** (เจนวิดีโอทีละฉากสูงสุด 15 วิ พร้อมต่อเฟรมสุดท้ายให้ภาพต่อเนื่อง) + **FFmpeg** (ต่อคลิปเป็น MP4 มาตรฐาน TikTok) + **TikTok Content Posting API**
 
 - **Zero npm dependencies** — ใช้ Node.js built-in ล้วน ติดตั้งง่าย ไม่ติด dependency bloat
 - **Web UI + Daily Scheduler** — ตั้งค่าธีมช่อง, เวลาโพสทุกวัน, เชื่อมต่อ TikTok OAuth, พรีวิวคลิป และกด Dry Run ฟรีได้ทันที

@@ -3,7 +3,7 @@ import path from 'node:path';
 import { clampInt, sanitizeError, validateResolution } from './config.js';
 
 const API_BASE = 'https://generativelanguage.googleapis.com';
-const PLANNER_MODEL = 'gemini-2.5-flash';
+const PLANNER_MODEL = 'gemini-3.8-flash';
 const VIDEO_MODEL = 'gemini-omni-1.2-flash';
 
 function requireApiKey() {
