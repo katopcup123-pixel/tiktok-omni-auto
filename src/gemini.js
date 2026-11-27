@@ -12,6 +12,17 @@ function requireApiKey() {
   return key;
 }
 
+async function fetchWithRetry(url, init, retries = 3) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch(url, init);
+    if (res.ok || ![429, 500, 502, 503, 504].includes(res.status) || attempt === retries) {
+      return res;
+    }
+    const waitMs = 2000 * Math.pow(2, attempt);
+    await new Promise((r) => setTimeout(r, waitMs));
+  }
+}
+
 export function computeScenePlanCount(targetDurationSec, sceneDurationSec) {
   const dur = clampInt(sceneDurationSec, 15, 3, 15);
   const total = clampInt(targetDurationSec, 150, 15, 180);
@@ -42,7 +53,7 @@ export async function planEpisode(settings, recentTitles = []) {
     `- Return strict JSON matching: { "title": string, "caption": string, "hashtags": string[], "scenes": [{ "index": number, "durationSec": number, "prompt": string }] }`,
   ].join('\n');
 
-  const res = await fetch(
+  const res = await fetchWithRetry(
     `${API_BASE}/v1beta/models/${PLANNER_MODEL}:generateContent`,
     {
       method: 'POST',
@@ -177,7 +188,7 @@ export async function generateSceneClip(prompt, options = {}) {
 
   let interaction;
   try {
-    const res = await fetch(`${API_BASE}/v1beta/interactions`, {
+    const res = await fetchWithRetry(`${API_BASE}/v1beta/interactions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
