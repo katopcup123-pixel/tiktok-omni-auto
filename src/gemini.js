@@ -68,6 +68,7 @@ export async function planEpisode(settings, recentTitles = []) {
           temperature: 0.9,
         },
       }),
+      signal: AbortSignal.timeout(60_000),
     }
   );
 
